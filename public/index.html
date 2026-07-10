@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>iPhone Seminuevos - Dashboard</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f1117;
+      color: #e4e4e7;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    .header {
+      background: #18181b;
+      border-bottom: 1px solid #27272a;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .header h1 span { color: #3b82f6; }
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .admin-link {
+      background: #27272a;
+      color: #a1a1aa;
+      padding: 8px 14px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 13px;
+      border: 1px solid #3f3f46;
+      transition: all 0.2s;
+    }
+    .admin-link:hover { background: #3f3f46; color: #fff; }
+    .refresh-btn {
+      background: #3b82f6;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .refresh-btn:hover { background: #2563eb; }
+    .refresh-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .last-update {
+      font-size: 12px;
+      color: #71717a;
+    }
+
+    /* Stats bar */
+    .stats-bar {
+      display: flex;
+      gap: 16px;
+      padding: 16px 24px;
+      overflow-x: auto;
+    }
+    .stat-card {
+      background: #18181b;
+      border: 1px solid #27272a;
+      border-radius: 12px;
+      padding: 16px 20px;
+      min-width: 160px;
+      flex-shrink: 0;
+    }
+    .stat-card .label { font-size: 12px; color: #71717a; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-card .value { font-size: 28px; font-weight: 700; margin-top: 4px; }
+    .stat-card .value.blue { color: #3b82f6; }
+    .stat-card .value.green { color: #22c55e; }
+    .stat-card .value.yellow { color: #eab308; }
+    .stat-card .value.red { color: #ef4444; }
+
+    /* Filter bar */
+    .filter-bar {
+      padding: 0 24px 16px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      background: #27272a;
+      color: #a1a1aa;
+      border: 1px solid #3f3f46;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .filter-btn:hover { background: #3f3f46; color: #fff; }
+    .filter-btn.active { background: #3b82f6; color: #fff; border-color: #3b82f6; }
+    .search-input {
+      background: #27272a;
+      border: 1px solid #3f3f46;
+      color: #e4e4e7;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      outline: none;
+      width: 220px;
+      transition: border-color 0.2s;
+    }
+    .search-input:focus { border-color: #3b82f6; }
+    .search-input::placeholder { color: #52525b; }
+
+    /* Grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(520px, 1fr));
+      gap: 16px;
+      padding: 0 24px 24px;
+    }
+    @media (max-width: 600px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+
+    /* Card */
+    .card {
+      background: #18181b;
+      border: 1px solid #27272a;
+      border-radius: 12px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .card:hover { border-color: #3f3f46; }
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      border-bottom: 1px solid #27272a;
+      cursor: pointer;
+      user-select: none;
+    }
+    .card-header:hover { background: #1f1f23; }
+    .card-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .card-title h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+    }
+    .badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+    .badge-count {
+      background: #1e3a5f;
+      color: #60a5fa;
+    }
+    .badge-stock {
+      background: #14532d;
+      color: #4ade80;
+      font-size: 10px;
+    }
+    .toggle-btn {
+      color: #71717a;
+      font-size: 12px;
+      font-weight: 500;
+      background: #27272a;
+      border: 1px solid #3f3f46;
+      padding: 4px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .toggle-btn:hover { background: #3f3f46; color: #fff; }
+
+    .card-body { padding: 0; }
+    .card-body.hidden { display: none; }
+
+    /* Table */
+    .table-wrap { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    thead th {
+      background: #1c1c21;
+      color: #71717a;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 10px 12px;
+      text-align: left;
+      position: sticky;
+      top: 0;
+      white-space: nowrap;
+    }
+    tbody tr { border-top: 1px solid #27272a; transition: background 0.15s; }
+    tbody tr:hover { background: #1f1f23; }
+    td { padding: 10px 12px; white-space: nowrap; }
+    td.wrap { white-space: normal; max-width: 180px; }
+
+    /* Status badges */
+    .status {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 12px;
+      display: inline-block;
+      text-transform: capitalize;
+    }
+    .status-revisando { background: #422006; color: #fbbf24; }
+    .status-aprobado { background: #14532d; color: #4ade80; }
+    .status-rechazado { background: #450a0a; color: #f87171; }
+    .status-corriendo { background: #0c4a6e; color: #38bdf8; }
+    .status-terminado { background: #1e1b4b; color: #a78bfa; }
+    .status-firmado { background: #14532d; color: #4ade80; }
+    .status-preadmision { background: #3b0764; color: #c084fc; }
+    .status-default { background: #27272a; color: #a1a1aa; }
+
+    /* Firma */
+    .firma-si { color: #4ade80; font-weight: 700; }
+    .firma-no { color: #52525b; }
+
+    /* Empty state */
+    .empty {
+      padding: 32px 16px;
+      text-align: center;
+      color: #52525b;
+      font-size: 13px;
+    }
+
+    /* Loading */
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 60px;
+      color: #71717a;
+      font-size: 14px;
+    }
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #3f3f46;
+      border-top-color: #3b82f6;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-right: 10px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Color dot */
+    .color-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 6px;
+      vertical-align: middle;
+      border: 1px solid #3f3f46;
+    }
+
+    /* Keynua link */
+    .keynua-link {
+      color: #60a5fa;
+      text-decoration: none;
+      font-size: 12px;
+    }
+    .keynua-link:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1><span>iPhone</span> Seminuevos</h1>
+    <div class="header-right">
+      <span class="last-update" id="lastUpdate"></span>
+      <a href="https://tools.baldecash.com/adminer.php" target="_blank" class="admin-link">Admin DB</a>
+      <button class="refresh-btn" id="refreshBtn" onclick="loadData()">Actualizar</button>
+    </div>
+  </div>
+
+  <div class="stats-bar" id="statsBar">
+    <div class="stat-card"><div class="label">Total solicitudes</div><div class="value blue" id="statTotal">-</div></div>
+    <div class="stat-card"><div class="label">Aprobados</div><div class="value green" id="statAprobados">-</div></div>
+    <div class="stat-card"><div class="label">Revisando</div><div class="value yellow" id="statRevisando">-</div></div>
+    <div class="stat-card"><div class="label">Rechazados</div><div class="value red" id="statRechazados">-</div></div>
+    <div class="stat-card"><div class="label">Firmados</div><div class="value green" id="statFirmados">-</div></div>
+  </div>
+
+  <div class="filter-bar">
+    <button class="filter-btn active" data-filter="all" onclick="setFilter('all', this)">Todos</button>
+    <button class="filter-btn" data-filter="revisando" onclick="setFilter('revisando', this)">Revisando</button>
+    <button class="filter-btn" data-filter="aprobado" onclick="setFilter('aprobado', this)">Aprobados</button>
+    <button class="filter-btn" data-filter="rechazado" onclick="setFilter('rechazado', this)">Rechazados</button>
+    <button class="filter-btn" data-filter="firmado" onclick="setFilter('firmado', this)">Firmados</button>
+    <input type="text" class="search-input" id="searchInput" placeholder="Buscar nombre o telefono..." oninput="applyFilters()">
+  </div>
+
+  <div class="grid" id="grid">
+    <div class="loading"><div class="spinner"></div>Cargando datos...</div>
+  </div>
+
+  <script>
+    const IPHONES = [
+      { nombre: "Iphone 16 White r/6/128",                   codigo: "IPHONE 16 128GB GRADO A - WHITE - JM4P5X4H4T", color: "#f5f5f4", family: "iPhone 16" },
+      { nombre: "Iphone 16 Ultramarine r/6/128",             codigo: "IPHONE 16 128GB GRADO A - ULTRAMARINE - GPJFF4DRH9", color: "#3b82f6", family: "iPhone 16" },
+      { nombre: "Iphone 16 Teal r/6/128",                    codigo: "IPHONE 16 128GB GRADO A - TEAL - L2Y6VRH3JL", color: "#2dd4bf", family: "iPhone 16" },
+      { nombre: "Iphone 15 Rosa r/6/128",                    codigo: "Iphone_15_Pink_6_128", color: "#f9a8d4", family: "iPhone 15" },
+      { nombre: "Iphone 15 Negro r/6/128",                   codigo: "Iphone_15_Negro_6_128", color: "#27272a", family: "iPhone 15" },
+      { nombre: "Iphone 13 Midnight r/4/128",                codigo: "Iphone_13_Midnight_4_128", color: "#1e293b", family: "iPhone 13" },
+      { nombre: "Iphone 16 Pro Desert Titanium r/8/128",     codigo: "Iphone_16_Pro_Desert_Titanium_8_128", color: "#d4a574", family: "iPhone 16 Pro" },
+      { nombre: "Iphone 16 Pro Natural Titanium r/8/128",    codigo: "iphone_16_pro_128gb_grado_a_natural_titanium_C957X0YG3G", color: "#a8a29e", family: "iPhone 16 Pro" },
+      { nombre: "Iphone 16 Pro Black Titanium r/8/128",      codigo: "Iphone_16_Pro_Black_Titanium_8_128", color: "#1c1917", family: "iPhone 16 Pro" },
+      { nombre: "Iphone 15 Pro Black Titanium r/8/128",      codigo: "Iphone_15_Pro_Black_Titanium_r_8_128", color: "#1c1917", family: "iPhone 15 Pro" },
+      { nombre: "Iphone 16 Pro Max Desert Titanium r/8/256", codigo: "Iphone_16_Pro_Max_Desert_Titanium_8_256", color: "#d4a574", family: "iPhone 16 Pro Max" },
+      { nombre: "Iphone 16 Pro Max Natural Titanium r/8/256",codigo: "Iphone_16_Pro_Max_Natural_Titanium_8_256", color: "#a8a29e", family: "iPhone 16 Pro Max" },
+      { nombre: "Iphone 16 Pro Max Black Titanium r/8/256",  codigo: "Iphone_16_Pro_Max_Black_Titanium_r_8_256", color: "#1c1917", family: "iPhone 16 Pro Max" },
+      { nombre: "Iphone 16 Pro Max White Titanium r/8/256",  codigo: "Iphone_16_Pro_Max_white_titanium_256_8", color: "#f5f5f4", family: "iPhone 16 Pro Max" },
+    ];
+
+    // Stock from Excel
+    const STOCK = {
+      "Iphone_13_Midnight_4_128": 2,
+      "Iphone_15_Pink_6_128": 1,
+      "Iphone_15_Negro_6_128": 2,
+      "Iphone_15_Pro_Black_Titanium_r_8_128": 1,
+      "IPHONE 16 128GB GRADO A - TEAL - L2Y6VRH3JL": 1,
+      "IPHONE 16 128GB GRADO A - ULTRAMARINE - GPJFF4DRH9": 1,
+      "IPHONE 16 128GB GRADO A - WHITE - JM4P5X4H4T": 1,
+      "Iphone_16_Pro_Desert_Titanium_8_128": 2,
+      "iphone_16_pro_128gb_grado_a_natural_titanium_C957X0YG3G": 4,
+      "Iphone_16_Pro_Black_Titanium_8_128": 3,
+      "Iphone_16_Pro_Max_Desert_Titanium_8_256": 1,
+      "Iphone_16_Pro_Max_Natural_Titanium_8_256": 1,
+      "Iphone_16_Pro_Max_Black_Titanium_r_8_256": 2,
+      "Iphone_16_Pro_Max_white_titanium_256_8": 1,
+    };
+
+    let allData = {};
+    let currentFilter = 'all';
+    let cardStates = {}; // track hidden/shown
+
+    async function loadData() {
+      const btn = document.getElementById('refreshBtn');
+      btn.disabled = true;
+      btn.textContent = 'Cargando...';
+      try {
+        const res = await fetch('/api/solicitudes');
+        allData = await res.json();
+        renderAll();
+        document.getElementById('lastUpdate').textContent = 'Actualizado: ' + new Date().toLocaleTimeString('es-PE');
+      } catch (err) {
+        document.getElementById('grid').innerHTML = '<div class="empty">Error al cargar datos: ' + err.message + '</div>';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Actualizar';
+      }
+    }
+
+    function getStatusClass(status) {
+      if (!status) return 'status-default';
+      const s = status.toLowerCase().trim();
+      if (s === 'aprobado') return 'status-aprobado';
+      if (s === 'rechazado') return 'status-rechazado';
+      if (s === 'revisando') return 'status-revisando';
+      if (s === 'corriendo') return 'status-corriendo';
+      if (s === 'terminado') return 'status-terminado';
+      if (s === 'preadmision') return 'status-preadmision';
+      if (s.includes('aprobar')) return 'status-aprobado';
+      if (s.includes('rechazar')) return 'status-rechazado';
+      return 'status-default';
+    }
+
+    function formatDate(d) {
+      if (!d) return '-';
+      const date = new Date(d);
+      const day = String(date.getDate()).padStart(2, '0');
+      const mon = String(date.getMonth() + 1).padStart(2, '0');
+      const hr = String(date.getHours()).padStart(2, '0');
+      const mn = String(date.getMinutes()).padStart(2, '0');
+      return `${day}/${mon} ${hr}:${mn}`;
+    }
+
+    function formatPhone(cel) {
+      if (!cel || cel === 999999999) return '-';
+      return String(cel);
+    }
+
+    function applyFilters() {
+      renderAll();
+    }
+
+    function setFilter(filter, btn) {
+      currentFilter = filter;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      applyFilters();
+    }
+
+    function toggleCard(codigo) {
+      cardStates[codigo] = !cardStates[codigo];
+      const body = document.getElementById('body-' + CSS.escape(codigo));
+      const btn = document.getElementById('btn-' + CSS.escape(codigo));
+      if (body) {
+        body.classList.toggle('hidden');
+        btn.textContent = body.classList.contains('hidden') ? 'Mostrar' : 'Ocultar';
+      }
+    }
+
+    function filterSolicitudes(solicitudes) {
+      const search = document.getElementById('searchInput').value.toLowerCase().trim();
+      return solicitudes.filter(s => {
+        // Status filter
+        if (currentFilter === 'firmado') {
+          if (!s.firmado) return false;
+        } else if (currentFilter !== 'all') {
+          const st = (s.status || '').toLowerCase().trim();
+          if (currentFilter === 'aprobado' && st !== 'aprobado' && !st.includes('aprobar')) return false;
+          if (currentFilter === 'rechazado' && st !== 'rechazado' && !st.includes('rechazar')) return false;
+          if (currentFilter === 'revisando' && st !== 'revisando') return false;
+        }
+        // Search filter
+        if (search) {
+          const name = (s.nombre || '').toLowerCase();
+          const cel = String(s.celular || '');
+          if (!name.includes(search) && !cel.includes(search)) return false;
+        }
+        return true;
+      });
+    }
+
+    function renderAll() {
+      const grid = document.getElementById('grid');
+      let html = '';
+      let totalSol = 0, aprobados = 0, revisando = 0, rechazados = 0, firmados = 0;
+
+      // Count stats from all data
+      for (const iphone of IPHONES) {
+        const sols = allData[iphone.codigo] || [];
+        totalSol += sols.length;
+        for (const s of sols) {
+          const st = (s.status || '').toLowerCase().trim();
+          if (st === 'aprobado' || st.includes('aprobar')) aprobados++;
+          if (st === 'revisando') revisando++;
+          if (st === 'rechazado' || st.includes('rechazar')) rechazados++;
+          if (s.firmado) firmados++;
+        }
+      }
+
+      document.getElementById('statTotal').textContent = totalSol;
+      document.getElementById('statAprobados').textContent = aprobados;
+      document.getElementById('statRevisando').textContent = revisando;
+      document.getElementById('statRechazados').textContent = rechazados;
+      document.getElementById('statFirmados').textContent = firmados;
+
+      for (const iphone of IPHONES) {
+        const sols = allData[iphone.codigo] || [];
+        const filtered = filterSolicitudes(sols);
+        const stock = STOCK[iphone.codigo] || 0;
+        const isHidden = cardStates[iphone.codigo] || false;
+
+        html += `
+          <div class="card">
+            <div class="card-header" onclick="toggleCard('${iphone.codigo.replace(/'/g, "\\'")}')">
+              <div class="card-title">
+                <span class="color-dot" style="background:${iphone.color}"></span>
+                <h3>${iphone.nombre}</h3>
+                <span class="badge badge-count">${filtered.length} sol.</span>
+                <span class="badge badge-stock">Stock: ${stock}</span>
+              </div>
+              <button class="toggle-btn" id="btn-${CSS.escape(iphone.codigo)}">${isHidden ? 'Mostrar' : 'Ocultar'}</button>
+            </div>
+            <div class="card-body ${isHidden ? 'hidden' : ''}" id="body-${CSS.escape(iphone.codigo)}">
+        `;
+
+        if (filtered.length === 0) {
+          html += '<div class="empty">Sin solicitudes</div>';
+        } else {
+          html += `
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Telefono</th>
+                    <th>Estado</th>
+                    <th>Firmado</th>
+                    <th>Nota</th>
+                    <th>Creado</th>
+                    <th>URL</th>
+                  </tr>
+                </thead>
+                <tbody>
+          `;
+          filtered.forEach((s, i) => {
+            const adminUrl = `https://tools.baldecash.com/adminer.php?mysql=databalde-cashsys.cloa3om0c8wi.us-west-2.rds.amazonaws.com&username=readonly_miguel_zavala&db=databalde-cashsys&select=solicitud&where%5B0%5D%5Bcol%5D=id&where%5B0%5D%5Bop%5D=%3D&where%5B0%5D%5Bval%5D=${s.id}`;
+            html += `
+              <tr>
+                <td>${i + 1}</td>
+                <td>${s.id}</td>
+                <td class="wrap">${s.nombre || '-'}</td>
+                <td>${formatPhone(s.celular)}</td>
+                <td><span class="status ${getStatusClass(s.status)}">${s.status || '-'}</span></td>
+                <td>${s.firmado ? '<span class="firma-si">SI</span>' : '<span class="firma-no">NO</span>'}</td>
+                <td class="wrap">${s.nota || '-'}</td>
+                <td>${formatDate(s.created_at)}</td>
+                <td><a href="${adminUrl}" target="_blank" class="keynua-link">Ver</a></td>
+              </tr>
+            `;
+          });
+          html += '</tbody></table></div>';
+        }
+
+        html += '</div></div>';
+      }
+
+      grid.innerHTML = html;
+    }
+
+    // Auto-refresh every 60s
+    loadData();
+    setInterval(loadData, 15000);
+  </script>
+</body>
+</html>
