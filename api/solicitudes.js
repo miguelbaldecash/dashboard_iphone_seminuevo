@@ -54,6 +54,7 @@ module.exports = async function handler(req, res) {
       JOIN categoria_producto_prestamo cpp ON s.id_categoria_producto_prestamo = cpp.id
       JOIN producto prod ON cpp.id_producto = prod.id
       WHERE prod.nombre IN (?)
+        AND s.created_at >= '2025-07-14'
         AND p.nombres NOT LIKE '%Prueba%'
         AND p.ape_pat NOT LIKE '%Prueba%'
         AND (s.source IS NULL OR s.source NOT IN ('PruebaCash'))
