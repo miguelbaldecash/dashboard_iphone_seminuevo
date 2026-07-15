@@ -334,11 +334,14 @@
       { nombre: "Iphone 16 Pro Max Natural Titanium r/8/256",codigo: "Iphone_16_Pro_Max_Natural_Titanium_8_256", color: "#a8a29e", family: "iPhone 16 Pro Max" },
       { nombre: "Iphone 16 Pro Max Black Titanium r/8/256",  codigo: "Iphone_16_Pro_Max_Black_Titanium_r_8_256", color: "#1c1917", family: "iPhone 16 Pro Max" },
       { nombre: "Iphone 16 Pro Max White Titanium r/8/256",  codigo: "Iphone_16_Pro_Max_white_titanium_256_8", color: "#f5f5f4", family: "iPhone 16 Pro Max" },
+      { nombre: "Iphone 13 Blanco r/4/128",                  codigo: "celular_iphone_13_blanco_r", color: "#f5f5f4", family: "iPhone 13" },
+      { nombre: "Iphone 16e Negro r/6/128",                  codigo: "iPhone_16e_128GB_negro_r", color: "#27272a", family: "iPhone 16e" },
+      { nombre: "Iphone 14 Midnight r/6/128",                codigo: "iphone_14_128gb_midnight_RA", color: "#1e293b", family: "iPhone 14" },
     ];
 
     // Stock from Excel
     const STOCK = {
-      "Iphone_13_Midnight_4_128": 2,
+      "Iphone_13_Midnight_4_128": 11,
       "Iphone_15_Pink_6_128": 1,
       "Iphone_15_Negro_6_128": 2,
       "Iphone_15_Pro_Black_Titanium_r_8_128": 1,
@@ -352,6 +355,9 @@
       "Iphone_16_Pro_Max_Natural_Titanium_8_256": 1,
       "Iphone_16_Pro_Max_Black_Titanium_r_8_256": 2,
       "Iphone_16_Pro_Max_white_titanium_256_8": 1,
+      "celular_iphone_13_blanco_r": 10,
+      "iPhone_16e_128GB_negro_r": 7,
+      "iphone_14_128gb_midnight_RA": 6,
     };
 
     let allData = {};
@@ -505,7 +511,7 @@
                     <th>Telefono</th>
                     <th>Estado</th>
                     <th>Firmado</th>
-                    <th>Nota</th>
+                    <th>Formulario</th>
                     <th>Creado</th>
                     <th>URL</th>
                   </tr>
@@ -522,7 +528,7 @@
                 <td>${formatPhone(s.celular)}</td>
                 <td><span class="status ${getStatusClass(s.status)}">${s.status || '-'}</span></td>
                 <td>${s.firmado ? '<span class="firma-si">SI</span>' : '<span class="firma-no">NO</span>'}</td>
-                <td class="wrap">${s.nota || '-'}</td>
+                <td>${s.formulario ? '<span class="firma-si">SI</span>' : '<span class="firma-no">NO</span>'}</td>
                 <td>${formatDate(s.created_at)}</td>
                 <td><a href="${adminUrl}" target="_blank" class="keynua-link">Ver</a></td>
               </tr>

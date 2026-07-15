@@ -1,10 +1,4 @@
-require('dotenv').config();
-const express = require('express');
 const mysql = require('mysql2/promise');
-const path = require('path');
-
-const app = express();
-app.use(express.static(path.join(__dirname, 'public')));
 
 const IPHONES = [
   { nombre: "Iphone 16 White r/6/128",                   codigo: "IPHONE 16 128GB GRADO A - WHITE - JM4P5X4H4T" },
@@ -26,33 +20,22 @@ const IPHONES = [
   { nombre: "Iphone 14 Midnight r/6/128",                codigo: "iphone_14_128gb_midnight_RA" }
 ];
 
-let pool;
+const EXCLUDED_IDS = [67012,68608,68610,76722,108317,108318,108319,108320,108321,108322,108323,108324,108325,108326,108327,108328,109218,118569,118608,118625,118626];
 
-function getPool() {
-  if (!pool) {
-    pool = mysql.createPool({
+module.exports = async function handler(req, res) {
+  let conn;
+  try {
+    conn = await mysql.createConnection({
       host: process.env.DB_HOST,
       database: process.env.DB_NAME,
       user: process.env.DB_USER,
       password: process.env.DB_PASS,
-      waitForConnections: true,
-      connectionLimit: 5,
       connectTimeout: 10000,
     });
-  }
-  return pool;
-}
 
-app.get('/api/config', (_req, res) => {
-  res.json({ iphones: IPHONES });
-});
-
-app.get('/api/solicitudes', async (_req, res) => {
-  try {
-    const db = getPool();
     const codigos = IPHONES.map(i => i.codigo);
 
-    const [rows] = await db.query(`
+    const [rows] = await conn.query(`
       SELECT
         s.id,
         s.status,
@@ -79,7 +62,6 @@ app.get('/api/solicitudes', async (_req, res) => {
       ORDER BY s.created_at DESC
     `, [codigos]);
 
-    // Group by producto_codigo
     const grouped = {};
     for (const codigo of codigos) {
       grouped[codigo] = [];
@@ -104,10 +86,7 @@ app.get('/api/solicitudes', async (_req, res) => {
   } catch (err) {
     console.error('DB Error:', err.message);
     res.status(500).json({ error: err.message });
+  } finally {
+    if (conn) await conn.end();
   }
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+};
